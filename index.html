@@ -1,1 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作品集</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="#home">我的作品集</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#portfolio" class="nav-link">作品</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">关于</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">联系</a>
+                </li>
+            </ul>
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
 
+    <!-- 首页介绍 -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">你好，我是<span class="highlight">创意者</span></h1>
+            <p class="hero-subtitle">专注于创造有意义的数字体验</p>
+            <div class="hero-buttons">
+                <a href="#portfolio" class="btn btn-primary">查看作品</a>
+                <a href="#contact" class="btn btn-secondary">联系我</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-placeholder">
+                <div class="geometric-shape"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 作品展示 -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+            <h2 class="section-title">我的作品</h2>
+            <div class="portfolio-filter">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="web">网页设计</button>
+                <button class="filter-btn" data-filter="app">应用程序</button>
+                <button class="filter-btn" data-filter="design">UI设计</button>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-category="web">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">网页项目</div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>响应式网站设计</h3>
+                        <p>现代化的响应式网站，采用最新的前端技术</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">HTML5</span>
+                            <span class="tag">CSS3</span>
+                            <span class="tag">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="app">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">移动应用</div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>移动应用程序</h3>
+                        <p>用户友好的移动应用，提供出色的用户体验</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">React Native</span>
+                            <span class="tag">UI/UX</span>
+                            <span class="tag">Firebase</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="design">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">UI设计</div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>UI界面设计</h3>
+                        <p>简洁美观的界面设计，注重用户体验</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Figma</span>
+                            <span class="tag">Adobe XD</span>
+                            <span class="tag">Sketch</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-category="web">
+                    <div class="portfolio-image">
+                        <div class="portfolio-placeholder">电商平台</div>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>电商平台</h3>
+                        <p>功能完整的电商平台，支持在线购物和支付</p>
+                        <div class="portfolio-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">MongoDB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我 -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">关于我</h2>
+                    <p>我是一名充满激情的前端开发者和设计师，专注于创造美观、实用的数字体验。拥有丰富的网页开发经验和对用户体验的深刻理解。</p>
+                    <div class="skills">
+                        <div class="skill-item">
+                            <span class="skill-name">HTML/CSS</span>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-name">JavaScript</span>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-name">React</span>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-name">UI/UX设计</span>
+                            <div class="skill-bar">
+                                <div class="skill-progress" data-width="75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="about-placeholder">个人照片</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">联系我</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>让我们合作创造惊人的项目</h3>
+                    <p>如果您有任何项目想法或者想要进一步了解我的工作，请随时与我联系。</p>
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <span class="icon">📧</span>
+                            <span>your.email@example.com</span>
+                        </div>
+                        <div class="contact-method">
+                            <span class="icon">📱</span>
+                            <span>+86 123 4567 8900</span>
+                        </div>
+                        <div class="contact-method">
+                            <span class="icon">💼</span>
+                            <span>LinkedIn</span>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">消息</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">发送消息</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 我的作品集. 保留所有权利.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
