@@ -29,9 +29,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message_type = 'error';
         } else {
             try {
-                // 处理图片上传
+                // 处理图片上传（支持多张图片）
                 $image_path = '';
-                if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+                if (isset($_FILES['image']) && is_array($_FILES['image']['error'])) {
+                    // 多张图片上传
+                    $upload_dir = '../uploads/';
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+                    
+                    $uploaded_images = [];
+                    $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    
+                    for ($i = 0; $i < count($_FILES['image']['error']); $i++) {
+                        if ($_FILES['image']['error'][$i] === 0) {
+                            $file_ext = strtolower(pathinfo($_FILES['image']['name'][$i], PATHINFO_EXTENSION));
+                            
+                            if (in_array($file_ext, $allowed_types)) {
+                                $file_name = uniqid() . '_' . $i . '.' . $file_ext;
+                                $file_path = $upload_dir . $file_name;
+                                
+                                if (move_uploaded_file($_FILES['image']['tmp_name'][$i], $file_path)) {
+                                    $uploaded_images[] = $file_name;
+                                } else {
+                                    $message = '图片上传失败';
+                                    $message_type = 'error';
+                                    break;
+                                }
+                            } else {
+                                $message = '只允许上传 JPG、PNG、GIF、WEBP 格式的图片';
+                                $message_type = 'error';
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!empty($uploaded_images)) {
+                        $image_path = implode(',', $uploaded_images);
+                    }
+                } elseif (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+                    // 单张图片上传（保持兼容性）
                     $upload_dir = '../uploads/';
                     if (!is_dir($upload_dir)) {
                         mkdir($upload_dir, 0777, true);
@@ -66,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     $file_ext = strtolower(pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION));
                     $allowed_types = ['mp4'];
-                    $max_size = 5 * 1024 * 1024; // 5MB
+                    $max_size = 10 * 1024 * 1024; // 10MB
                     
                     if (in_array($file_ext, $allowed_types)) {
                         if ($_FILES['video']['size'] <= $max_size) {
@@ -80,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $message_type = 'error';
                             }
                         } else {
-                            $message = '视频文件大小不能超过 5MB';
+                            $message = '视频文件大小不能超过 10MB';
                             $message_type = 'error';
                         }
                     } else {
@@ -107,8 +144,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $old_files = $stmt->fetch();
                             
                             // 删除旧文件
-                            if (!empty($image_path) && $old_files['image'] && file_exists('../uploads/' . $old_files['image'])) {
-                                unlink('../uploads/' . $old_files['image']);
+                            if (!empty($image_path) && $old_files['image']) {
+                                $old_images = explode(',', $old_files['image']);
+                                foreach ($old_images as $old_image) {
+                                    $old_image = trim($old_image);
+                                    if ($old_image && file_exists('../uploads/' . $old_image)) {
+                                        unlink('../uploads/' . $old_image);
+                                    }
+                                }
                             }
                             if (!empty($video_path) && $old_files['video'] && file_exists('../uploads/' . $old_files['video'])) {
                                 unlink('../uploads/' . $old_files['video']);
@@ -139,8 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$id]);
             $files = $stmt->fetch();
             
-            if ($files['image'] && file_exists('../uploads/' . $files['image'])) {
-                unlink('../uploads/' . $files['image']);
+            if ($files['image']) {
+                $images = explode(',', $files['image']);
+                foreach ($images as $image) {
+                    $image = trim($image);
+                    if ($image && file_exists('../uploads/' . $image)) {
+                        unlink('../uploads/' . $image);
+                    }
+                }
             }
             if ($files['video'] && file_exists('../uploads/' . $files['video'])) {
                 unlink('../uploads/' . $files['video']);
@@ -358,7 +407,17 @@ ob_start();
                                                     您的浏览器不支持视频播放
                                                 </video>
                                             <?php elseif ($work['image']): ?>
-                                                <img src="../uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <?php 
+                                                $images = explode(',', $work['image']);
+                                                if (count($images) > 1): ?>
+                                                    <div style="display: flex; flex-wrap: wrap; height: 100%;">
+                                                        <?php foreach ($images as $index => $image): ?>
+                                                            <img src="../uploads/<?php echo e(trim($image)); ?>" alt="<?php echo e($work['title']); ?>" style="width: <?php echo count($images) > 2 ? '50%' : '100%'; ?>; height: <?php echo count($images) > 2 ? '50%' : '100%'; ?>; object-fit: cover; <?php echo $index > 0 ? 'border-left: 1px solid #fff;' : ''; ?>">
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <img src="../uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <?php endif; ?>
                                             <?php else: ?>
                                                 <span style="color: #ccc; font-size: 12px;">暂无图片/视频</span>
                                             <?php endif; ?>
@@ -526,9 +585,9 @@ ob_start();
                                     <button type="button" class="layui-btn layui-btn-normal" id="uploadBtn">
                                         <i class="layui-icon layui-icon-upload"></i> 选择图片
                                     </button>
-                                    <input type="file" name="image" accept="image/*" style="display: none;" id="fileInput">
+                                    <input type="file" name="image[]" accept="image/*" multiple style="display: none;" id="fileInput">
                                 </div>
-                                <div class="layui-form-mid layui-word-aux">支持JPG、PNG、GIF、WEBP格式</div>
+                                <div class="layui-form-mid layui-word-aux">支持JPG、PNG、GIF、WEBP格式，可选择多张图片</div>
                                 <div id="imagePreview" style="margin-top: 10px;"></div>
                             </div>
                         </div>
@@ -542,7 +601,7 @@ ob_start();
                                     </button>
                                     <input type="file" name="video" accept="video/mp4" style="display: none;" id="videoFileInput">
                                 </div>
-                                <div class="layui-form-mid layui-word-aux">支持MP4格式，最大5MB</div>
+                                <div class="layui-form-mid layui-word-aux">支持MP4格式，最大10MB</div>
                                 <div id="videoPreview" style="margin-top: 10px;"></div>
                             </div>
                         </div>
@@ -597,13 +656,20 @@ ob_start();
                         };
                         
                         fileInput.onchange = function(e) {
-                            var file = e.target.files[0];
-                            if (file) {
-                                var reader = new FileReader();
-                                reader.onload = function(e) {
-                                    imagePreview.innerHTML = '<img src="' + e.target.result + '" style="max-width: 300px; max-height: 200px; border-radius: 6px;">';
-                                };
-                                reader.readAsDataURL(file);
+                            var files = e.target.files;
+                            if (files.length > 0) {
+                                imagePreview.innerHTML = '';
+                                for (var i = 0; i < files.length; i++) {
+                                    var file = files[i];
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        var img = document.createElement('img');
+                                        img.src = e.target.result;
+                                        img.style.cssText = 'max-width: 150px; max-height: 150px; border-radius: 6px; margin-right: 10px; margin-bottom: 10px;';
+                                        imagePreview.appendChild(img);
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
                             }
                         };
                         
@@ -620,9 +686,9 @@ ob_start();
                             var file = e.target.files[0];
                             if (file) {
                                 // 检查文件大小
-                                var maxSize = 5 * 1024 * 1024; // 5MB
+                                var maxSize = 10 * 1024 * 1024; // 10MB
                                 if (file.size > maxSize) {
-                                    layer.msg('视频文件大小不能超过5MB', {icon: 2});
+                                    layer.msg('视频文件大小不能超过10MB', {icon: 2});
                                     videoFileInput.value = '';
                                     return;
                                 }
@@ -776,12 +842,16 @@ ob_start();
                                     <button type="button" class="layui-btn layui-btn-normal" id="editUploadBtn">
                                         <i class="layui-icon layui-icon-upload"></i> 选择新图片
                                     </button>
-                                    <input type="file" name="image" accept="image/*" style="display: none;" id="editFileInput">
+                                    <input type="file" name="image[]" accept="image/*" multiple style="display: none;" id="editFileInput">
                                 </div>
-                                <div class="layui-form-mid layui-word-aux">支持JPG、PNG、GIF、WEBP格式，不选择则保持原图片</div>
+                                <div class="layui-form-mid layui-word-aux">支持JPG、PNG、GIF、WEBP格式，可选择多张图片，不选择则保持原图片</div>
                                 <div id="editImagePreview" style="margin-top: 10px;">
                                     <?php if ($edit_work && $edit_work['image']): ?>
-                                        <img src="../uploads/<?php echo e($edit_work['image']); ?>" style="max-width: 300px; max-height: 200px; border-radius: 6px;">
+                                        <?php 
+                                        $images = explode(',', $edit_work['image']);
+                                        foreach ($images as $image): ?>
+                                            <img src="../uploads/<?php echo e(trim($image)); ?>" style="max-width: 150px; max-height: 150px; border-radius: 6px; margin-right: 10px; margin-bottom: 10px;">
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -796,7 +866,7 @@ ob_start();
                                     </button>
                                     <input type="file" name="video" accept="video/mp4" style="display: none;" id="editVideoFileInput">
                                 </div>
-                                <div class="layui-form-mid layui-word-aux">支持MP4格式，最大5MB，不选择则保持原视频</div>
+                                <div class="layui-form-mid layui-word-aux">支持MP4格式，最大10MB，不选择则保持原视频</div>
                                 <div id="editVideoPreview" style="margin-top: 10px;">
                                     <?php if ($edit_work && $edit_work['video']): ?>
                                         <video controls style="max-width: 300px; max-height: 200px; border-radius: 6px;">
@@ -857,13 +927,20 @@ ob_start();
                         };
                         
                         fileInput.onchange = function(e) {
-                            var file = e.target.files[0];
-                            if (file) {
-                                var reader = new FileReader();
-                                reader.onload = function(e) {
-                                    imagePreview.innerHTML = '<img src="' + e.target.result + '" style="max-width: 300px; max-height: 200px; border-radius: 6px;">';
-                                };
-                                reader.readAsDataURL(file);
+                            var files = e.target.files;
+                            if (files.length > 0) {
+                                imagePreview.innerHTML = '';
+                                for (var i = 0; i < files.length; i++) {
+                                    var file = files[i];
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        var img = document.createElement('img');
+                                        img.src = e.target.result;
+                                        img.style.cssText = 'max-width: 150px; max-height: 150px; border-radius: 6px; margin-right: 10px; margin-bottom: 10px;';
+                                        imagePreview.appendChild(img);
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
                             }
                         };
                         
@@ -880,9 +957,9 @@ ob_start();
                             var file = e.target.files[0];
                             if (file) {
                                 // 检查文件大小
-                                var maxSize = 5 * 1024 * 1024; // 5MB
+                                var maxSize = 10 * 1024 * 1024; // 10MB
                                 if (file.size > maxSize) {
-                                    layer.msg('视频文件大小不能超过5MB', {icon: 2});
+                                    layer.msg('视频文件大小不能超过10MB', {icon: 2});
                                     videoFileInput.value = '';
                                     return;
                                 }
