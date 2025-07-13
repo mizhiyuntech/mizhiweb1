@@ -291,6 +291,31 @@ if ($current_category) {
             object-fit: cover;
         }
         
+        .work-multi-images {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .work-multi-images img {
+            border-radius: 2px;
+        }
+        
+        .more-images-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 400;
+            z-index: 2;
+        }
+        
         .work-media-indicator {
             position: absolute;
             top: 10px;
@@ -777,7 +802,31 @@ if ($current_category) {
                                     
                                     if ($has_image && $has_video): ?>
                                         <!-- 同时有图片和视频，显示图片并添加指示器 -->
-                                        <img src="uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>">
+                                        <?php
+                                        // 处理多张图片
+                                        $images = explode(',', $work['image']);
+                                        $images = array_filter($images); // 移除空值
+                                        if (count($images) > 1): ?>
+                                            <!-- 多张图片 -->
+                                            <div class="work-multi-images">
+                                                <?php foreach ($images as $index => $image): ?>
+                                                    <img src="uploads/<?php echo e(trim($image)); ?>" alt="<?php echo e($work['title']); ?>" 
+                                                         class="multi-image-<?php echo $index; ?>" 
+                                                         style="width: <?php echo count($images) > 4 ? '48%' : (count($images) > 2 ? '48%' : '100%'); ?>; 
+                                                                height: <?php echo count($images) > 4 ? '48%' : (count($images) > 2 ? '48%' : '100%'); ?>; 
+                                                                object-fit: cover; 
+                                                                <?php if ($index > 0): ?>margin-left: 4%;<?php endif; ?>
+                                                                <?php if ($index >= 2): ?>margin-top: 4%;<?php endif; ?>">
+                                                    <?php if ($index >= 3): break; endif; ?>
+                                                <?php endforeach; ?>
+                                                <?php if (count($images) > 4): ?>
+                                                    <div class="more-images-indicator">+<?php echo count($images) - 4; ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <!-- 单张图片 -->
+                                            <img src="uploads/<?php echo e(trim($images[0])); ?>" alt="<?php echo e($work['title']); ?>">
+                                        <?php endif; ?>
                                         <div class="work-media-indicator">图片+视频</div>
                                         <div class="work-overlay">点击查看详情</div>
                                     <?php elseif ($has_video): ?>
@@ -789,7 +838,31 @@ if ($current_category) {
                                         <div class="work-media-indicator">视频</div>
                                     <?php elseif ($has_image): ?>
                                         <!-- 只有图片 -->
-                                        <img src="uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>">
+                                        <?php
+                                        // 处理多张图片
+                                        $images = explode(',', $work['image']);
+                                        $images = array_filter($images); // 移除空值
+                                        if (count($images) > 1): ?>
+                                            <!-- 多张图片 -->
+                                            <div class="work-multi-images">
+                                                <?php foreach ($images as $index => $image): ?>
+                                                    <img src="uploads/<?php echo e(trim($image)); ?>" alt="<?php echo e($work['title']); ?>" 
+                                                         class="multi-image-<?php echo $index; ?>" 
+                                                         style="width: <?php echo count($images) > 4 ? '48%' : (count($images) > 2 ? '48%' : '100%'); ?>; 
+                                                                height: <?php echo count($images) > 4 ? '48%' : (count($images) > 2 ? '48%' : '100%'); ?>; 
+                                                                object-fit: cover; 
+                                                                <?php if ($index > 0): ?>margin-left: 4%;<?php endif; ?>
+                                                                <?php if ($index >= 2): ?>margin-top: 4%;<?php endif; ?>">
+                                                    <?php if ($index >= 3): break; endif; ?>
+                                                <?php endforeach; ?>
+                                                <?php if (count($images) > 4): ?>
+                                                    <div class="more-images-indicator">+<?php echo count($images) - 4; ?></div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <!-- 单张图片 -->
+                                            <img src="uploads/<?php echo e(trim($images[0])); ?>" alt="<?php echo e($work['title']); ?>">
+                                        <?php endif; ?>
                                         <div class="work-media-indicator">图片</div>
                                         <div class="work-overlay">点击查看详情</div>
                                     <?php else: ?>
