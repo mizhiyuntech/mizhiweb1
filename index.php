@@ -791,6 +791,7 @@ if ($current_category) {
                                         <!-- 只有图片 -->
                                         <img src="uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>">
                                         <div class="work-media-indicator">图片</div>
+                                        <div class="work-overlay">点击查看详情</div>
                                     <?php else: ?>
                                         <!-- 没有媒体文件 -->
                                         <span>暂无图片</span>
