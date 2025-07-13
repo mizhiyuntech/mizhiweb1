@@ -712,7 +712,13 @@ ob_start();
                             for (var i = 0; i < inputs.length; i++) {
                                 var input = inputs[i];
                                 if (input.type === 'file') {
-                                    if (input.files[0]) {
+                                    if (input.name === 'image[]' && input.files.length > 0) {
+                                        // 处理多个图片文件
+                                        for (var j = 0; j < input.files.length; j++) {
+                                            formData.append('image[]', input.files[j]);
+                                        }
+                                    } else if (input.name === 'video' && input.files[0]) {
+                                        // 处理单个视频文件
                                         formData.append(input.name, input.files[0]);
                                     }
                                 } else if (input.type === 'checkbox') {
@@ -983,7 +989,13 @@ ob_start();
                             for (var i = 0; i < inputs.length; i++) {
                                 var input = inputs[i];
                                 if (input.type === 'file') {
-                                    if (input.files[0]) {
+                                    if (input.name === 'image[]' && input.files.length > 0) {
+                                        // 处理多个图片文件
+                                        for (var j = 0; j < input.files.length; j++) {
+                                            formData.append('image[]', input.files[j]);
+                                        }
+                                    } else if (input.name === 'video' && input.files[0]) {
+                                        // 处理单个视频文件
                                         formData.append(input.name, input.files[0]);
                                     }
                                 } else if (input.type === 'checkbox') {
