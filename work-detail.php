@@ -325,36 +325,39 @@ $site_name = $site_settings['site_name'] ?? '作品集网站';
                     <h3>作品展示</h3>
                     <div class="media-grid">
                         <?php
-                        $has_image = !empty($work['image']);
+                        // 处理多个图片
+                        $images = array();
+                        if (!empty($work['image'])) {
+                            $image_files = explode(',', $work['image']);
+                            foreach ($image_files as $image_file) {
+                                $image_file = trim($image_file);
+                                if ($image_file) {
+                                    $images[] = $image_file;
+                                }
+                            }
+                        }
+                        
+                        $has_images = !empty($images);
                         $has_video = !empty($work['video']);
                         
-                        if ($has_image && $has_video): ?>
-                            <!-- 同时有图片和视频 -->
-                            <div class="media-item" onclick="openFullscreen('image', 'uploads/<?php echo e($work['image']); ?>')">
-                                <img src="uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>">
-                                <div class="media-label">图片</div>
-                            </div>
-                            <div class="media-item">
+                        // 显示图片
+                        if ($has_images): 
+                            foreach ($images as $index => $image): ?>
+                                <div class="media-item" onclick="openFullscreen('image', 'uploads/<?php echo e($image); ?>')">
+                                    <img src="uploads/<?php echo e($image); ?>" alt="<?php echo e($work['title']); ?>">
+                                    <div class="media-label">图片 <?php echo ($index + 1); ?></div>
+                                </div>
+                            <?php endforeach;
+                        endif;
+                        
+                        // 显示视频
+                        if ($has_video): ?>
+                            <div class="media-item<?php echo (!$has_images) ? ' single-media' : ''; ?>">
                                 <video controls>
                                     <source src="uploads/<?php echo e($work['video']); ?>" type="video/mp4">
                                     您的浏览器不支持视频播放
                                 </video>
                                 <div class="media-label">视频</div>
-                            </div>
-                        <?php elseif ($has_video): ?>
-                            <!-- 只有视频 -->
-                            <div class="media-item single-media">
-                                <video controls>
-                                    <source src="uploads/<?php echo e($work['video']); ?>" type="video/mp4">
-                                    您的浏览器不支持视频播放
-                                </video>
-                                <div class="media-label">视频</div>
-                            </div>
-                        <?php elseif ($has_image): ?>
-                            <!-- 只有图片 -->
-                            <div class="media-item single-media" onclick="openFullscreen('image', 'uploads/<?php echo e($work['image']); ?>')">
-                                <img src="uploads/<?php echo e($work['image']); ?>" alt="<?php echo e($work['title']); ?>">
-                                <div class="media-label">图片</div>
                             </div>
                         <?php endif; ?>
                     </div>
